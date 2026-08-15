@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1>Outlier Badge</h1>
+
+  <div id="permission" class="warn" hidden>
+    <span data-i18n="popupPermission"></span>
+    <button id="grant" type="button" data-i18n="popupGrant"></button>
+  </div>
+
+  <label class="row">
+    <span data-i18n="popupEnabled"></span>
+    <input type="checkbox" id="enabled">
+  </label>
+
+  <label class="row">
+    <span data-i18n="popupScoreShorts"></span>
+    <input type="checkbox" id="scoreShorts">
+  </label>
+
+  <label class="row">
+    <span data-i18n="popupShowPanel"></span>
+    <input type="checkbox" id="showPanel">
+  </label>
+
+  <label class="row">
+    <span data-i18n="popupBaselineSize"></span>
+    <select id="baselineSize"></select>
+  </label>
+
+  <label class="row">
+    <span data-i18n="popupMinScore"></span>
+    <select id="minScore"></select>
+  </label>
+
+  <label class="row">
+    <span data-i18n="popupTtl"></span>
+    <select id="ttlHours"></select>
+  </label>
+
+  <label class="row">
+    <span data-i18n="popupLanguage"></span>
+    <select id="language"></select>
+  </label>
+
+  <div class="stats" id="stats"></div>
+
+  <button id="clear" type="button" class="wide" data-i18n="popupClear"></button>
+
+  <p class="note" data-i18n="popupNote"></p>
+
+  <script src="../src/i18n.js"></script>
+  <script src="../src/store.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "version": "0.1.0",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "outlier-badge@yusufipk",
+      "strict_min_version": "115.0"
+    }
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["*://www.youtube.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*"],
+      "js": [
+        "src/i18n.js",
+        "src/parse.js",
+        "src/innertube.js",
+        "src/store.js",
+        "src/score.js",
+        "src/badge.js",
+        "src/panel.js",
+        "src/content.js"
+      ],
+      "css": ["src/style.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": { "64": "icons/icon.svg" },
+  "action": {
+    "default_title": "Outlier Badge",
+    "default_popup": "popup/popup.html",
+    "default_icon": { "64": "icons/icon.svg" }
+  }
+}

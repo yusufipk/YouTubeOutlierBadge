@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Outlier Badge",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Puts an outlier score on the corner of every YouTube thumbnail: the video's views over its own channel's median.",
+    "description": "Extension description"
+  }
+}

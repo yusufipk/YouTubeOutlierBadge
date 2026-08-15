@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Outlier Badge",
+    "description": "Eklenti adı"
+  },
+  "extDescription": {
+    "message": "Her YouTube kapağının köşesine outlier skorunu basar: videonun izlenmesi, kendi kanalının medyanının kaç katı.",
+    "description": "Eklenti açıklaması"
+  }
+}
