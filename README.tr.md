@@ -19,31 +19,6 @@ işlenir.
 `about:debugging#/runtime/this-firefox` → **Geçici Eklenti Yükle** → bu dizindeki
 `manifest.json`. Firefox kapanınca kaybolur.
 
-## Kalıcı kurulum
-
-Normal Firefox imzasız eklentiyi kalıcı kurmaz. İmzalatmak ücretsiz ve eklentiyi
-kimseye göstermez:
-
-1. addons.mozilla.org/developers'da hesap aç, **Manage API Keys** sayfasından JWT
-   issuer ve secret al.
-2. Paketi imzalat (npm bu dizine bir şey kurmasın diye kapsayıcı içinde):
-
-   ```
-   podman run --rm -v "$(pwd)":/w:z -w /w docker.io/node:alpine \
-     npx --yes web-ext sign --channel=unlisted \
-     --api-key=JWT_ISSUER --api-secret=JWT_SECRET
-   ```
-
-3. Çıkan `web-ext-artifacts/*.xpi` dosyasını `about:addons` → dişli simgesi →
-   **Dosyadan eklenti yükle** ile kur.
-
-İmza `manifest.json` içindeki eklenti kimliğine bağlı, o yüzden kimliği
-değiştirme. Her yeni imza için `version` alanını artırman gerekir ve listelenmemiş
-eklentiler otomatik güncellenmez: kodu değiştirdikçe imzalayıp yeniden kurarsın.
-İmzayla uğraşmak istemezsen Firefox Developer Edition veya Nightly kurup
-`about:config` içinde `xpinstall.signatures.required` değerini `false` yapmak da
-çalışır, ama bu ayar normal Firefox'ta yok sayılır.
-
 ## Kullanım
 
 Araç çubuğundaki simge ayarları açar: rozetleri kapat, Shorts'u puanlama, baseline

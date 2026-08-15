@@ -21,31 +21,6 @@ are only processed once they scroll into view.
 `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → the
 `manifest.json` in this directory. It disappears when Firefox closes.
 
-## Installing it for good
-
-Release Firefox refuses to permanently install an unsigned add-on. Getting it
-signed is free and shows the extension to nobody:
-
-1. Create an account at addons.mozilla.org/developers and grab a JWT issuer and
-   secret from **Manage API Keys**.
-2. Sign the package (inside a container so npm never touches this directory):
-
-   ```
-   podman run --rm -v "$(pwd)":/w:z -w /w docker.io/node:alpine \
-     npx --yes web-ext sign --channel=unlisted \
-     --api-key=JWT_ISSUER --api-secret=JWT_SECRET
-   ```
-
-3. Install the resulting `web-ext-artifacts/*.xpi` through `about:addons` → gear
-   icon → **Install Add-on From File**.
-
-The signature is tied to the add-on id in `manifest.json`, so leave that id
-alone. Every new signature needs a bumped `version`, and unlisted add-ons do not
-auto-update: when you change the code you sign and install it again. If you would
-rather skip signing altogether, Firefox Developer Edition and Nightly honour
-`xpinstall.signatures.required = false` in `about:config`, but release Firefox
-ignores that setting.
-
 ## Using it
 
 The toolbar icon opens the settings: turn badges off, skip Shorts, pick the
