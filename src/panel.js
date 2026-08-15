@@ -12,7 +12,6 @@ var OBPanel = (function () {
 
   var P = OBParse;
   var T = OBI18n;
-  var SVG = "http://www.w3.org/2000/svg";
 
   function el(tag, cls, text) {
     var node = document.createElement(tag);
@@ -21,44 +20,75 @@ var OBPanel = (function () {
     return node;
   }
 
-  function svgEl(tag, attrs) {
-    var node = document.createElementNS(SVG, tag);
-    for (var k in attrs) node.setAttribute(k, attrs[k]);
-    return node;
+  function agoText(days) {
+    if (days == null) return "";
+    if (days < 60) return T.t("agoDays", Math.round(days));
+    if (days < 730) return T.t("agoMonths", Math.round(days / 30.44));
+    return T.t("agoYears", Math.round(days / 365.25));
   }
 
   /* Kanalın son videolarının izlenme dağılımı, eskiden yeniye.
-   * Bu video vurgulu, medyan kesikli çizgi. */
+   *
+   * Çubuklar SVG değil düz HTML: SVG <title> ipucu balonu Firefox'ta ancak
+   * uzun beklemeyle çıkıyor ve ince çubuklarda fareyi yakalamak zor. Burada
+   * her çubuğun arkasında tam yükseklikte görünmez bir isabet alanı var ve
+   * balonu kendimiz çiziyoruz. */
   function distribution(pool, videoId, median) {
     var items = pool.slice().reverse();
-    var w = 100, h = 46;
-    var svg = svgEl("svg", { viewBox: "0 0 " + w + " " + h, class: "ob-chart", preserveAspectRatio: "none" });
+    var wrap = el("div", "ob-chart-wrap");
+    var chart = el("div", "ob-chart");
     var max = 0;
     for (var i = 0; i < items.length; i++) max = Math.max(max, items[i].views || 0);
-    if (!max) return svg;
-    var bw = w / items.length;
-    for (var j = 0; j < items.length; j++) {
-      var v = items[j].views || 0;
-      var bh = Math.max(1, (v / max) * (h - 2));
-      var bar = svgEl("rect", {
-        x: (j * bw + bw * 0.12).toFixed(2),
-        y: (h - bh).toFixed(2),
-        width: (bw * 0.76).toFixed(2),
-        height: bh.toFixed(2),
-        class: items[j].id === videoId ? "ob-bar ob-bar-self" : "ob-bar"
-      });
-      var tip = svgEl("title", {});
-      tip.textContent = P.humanCount(v);
-      bar.appendChild(tip);
-      svg.appendChild(bar);
-    }
+    if (!max) return wrap;
+
     if (median) {
-      var y = h - (median / max) * (h - 2);
-      svg.appendChild(svgEl("line", {
-        x1: 0, x2: w, y1: y.toFixed(2), y2: y.toFixed(2), class: "ob-median"
-      }));
+      var line = el("div", "ob-median");
+      line.style.bottom = ((median / max) * 100).toFixed(2) + "%";
+      chart.appendChild(line);
     }
-    return svg;
+
+    var tip = el("div", "ob-tip");
+    tip.hidden = true;
+
+    items.forEach(function (item) {
+      var slot = el("div", "ob-slot");
+      var bar = el("div", "ob-bar" + (item.id === videoId ? " ob-bar-self" : ""));
+      bar.style.height = Math.max(1, (item.views / max) * 100).toFixed(2) + "%";
+      slot.appendChild(bar);
+
+      slot.addEventListener("mouseenter", function () {
+        tip.textContent = "";
+        if (item.title) tip.appendChild(el("div", "ob-tip-title", item.title));
+        var meta = [T.t("tipViews", P.humanCount(item.views))];
+        if (item.age != null) meta.push(agoText(item.age));
+        if (item.id === videoId) meta.push(T.t("tipThisVideo"));
+        tip.appendChild(el("div", "ob-tip-meta", meta.join(" · ")));
+        tip.hidden = false;
+        /* Balon grafiğin içinde konumlanır, kenarlardan taşmaması için
+         * yatayda kırpılır. */
+        var left = slot.offsetLeft + slot.offsetWidth / 2;
+        tip.style.left = Math.min(Math.max(left, 90), chart.offsetWidth - 90) + "px";
+      });
+      slot.addEventListener("click", function () {
+        window.open("https://www.youtube.com/watch?v=" + item.id, "_blank", "noopener");
+      });
+      chart.appendChild(slot);
+    });
+
+    chart.addEventListener("mouseleave", function () { tip.hidden = true; });
+    chart.appendChild(tip);
+    wrap.appendChild(chart);
+
+    var legend = el("div", "ob-legend");
+    legend.appendChild(el("span", "ob-legend-median", T.t("chartMedianLegend")));
+    if (items.some(function (v) { return v.id === videoId; })) {
+      legend.appendChild(el("span", "ob-legend-self", T.t("chartSelfLegend")));
+    } else {
+      legend.appendChild(el("span", null, T.t("chartNotInPool", items.length)));
+    }
+    legend.appendChild(el("span", null, T.t("chartHint")));
+    wrap.appendChild(legend);
+    return wrap;
   }
 
   function row(label, value) {

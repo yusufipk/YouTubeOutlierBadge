@@ -53,7 +53,11 @@ var OBScore = (function () {
       out.push({
         id: v.videoId,
         views: v.views,
-        age: v.ageDays == null ? null : Math.round(v.ageDays * 10) / 10
+        age: v.ageDays == null ? null : Math.round(v.ageDays * 10) / 10,
+        /* Başlık sadece paneldeki dağılım grafiğinin ipucu balonu için; skorun
+         * kendisi kullanmaz. Kanal başına 30 başlık önbelleğe birkaç kilobayt
+         * ekliyor, karşılığında çubuklar hangi video olduklarını söylüyor. */
+        title: (v.title || "").slice(0, 70)
       });
     }
     return out;

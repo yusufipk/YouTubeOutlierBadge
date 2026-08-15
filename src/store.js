@@ -11,7 +11,8 @@ var OBStore = (function () {
   var api = (typeof browser !== "undefined" ? browser : chrome);
   var local = api.storage.local;
 
-  var CACHE_VERSION = 1;
+  /* 2: baseline videolarına başlık eklendi (panelin grafik ipuçları için). */
+  var CACHE_VERSION = 2;
   var MAX_CHANNELS = 400;   /* aşılınca en eski baseline'lar silinir */
 
   var DEFAULTS = {
