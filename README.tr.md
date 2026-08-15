@@ -47,3 +47,7 @@ Ayrıştırma ve skor mantığını tarayıcı açmadan denemek için `node test
 - Havuzda 3'ten az video kalırsa skor hesaplanmaz, rozet çıkmaz.
 - InnerTube resmi olmayan bir arayüz. YouTube alan adlarını değiştirirse rozet
   kaybolur, sayfa bozulmaz.
+
+## Lisans
+
+GPL-3.0-or-later. Bkz. [LICENSE](LICENSE).

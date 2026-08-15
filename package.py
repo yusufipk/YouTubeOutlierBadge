@@ -17,6 +17,7 @@ import zipfile
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 INCLUDE_DIRS = ["src", "popup", "icons", "_locales"]
+INCLUDE_FILES = ["manifest.json", "LICENSE"]  # GPL kopyası pakette de bulunmalı
 OUTPUT = "outlier-badge.zip"
 
 
@@ -75,7 +76,8 @@ def main():
     if os.path.exists(OUTPUT):
         os.remove(OUTPUT)
     with zipfile.ZipFile(OUTPUT, "w", zipfile.ZIP_DEFLATED) as z:
-        z.write("manifest.json")
+        for f in INCLUDE_FILES:
+            z.write(f)
         for d in INCLUDE_DIRS:
             for root, _, names in os.walk(d):
                 for name in sorted(names):

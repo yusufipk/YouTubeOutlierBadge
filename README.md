@@ -51,3 +51,7 @@ To exercise the parsing and scoring logic without opening a browser, run
   appears.
 - InnerTube is an unofficial interface. If YouTube renames its fields the badges
   disappear; the page itself keeps working.
+
+## License
+
+GPL-3.0-or-later. See [LICENSE](LICENSE).
