@@ -47,10 +47,3 @@ To exercise the parsing and scoring logic without opening a browser, run
   appears.
 - InnerTube is an unofficial interface. If YouTube renames its fields the badges
   disappear; the page itself keeps working.
-
-There is **no** views-over-time chart, because YouTube publishes no historical
-view data for any video. vidIQ, Social Blade and everyone else build that curve
-from snapshots they collect themselves; in a single-user extension it would take
-months to appear and only for videos you personally opened. The watch page panel
-shows the two things that work without waiting instead: where the video sits in
-its channel's distribution, and its average views per day.

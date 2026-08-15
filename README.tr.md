@@ -43,10 +43,3 @@ Ayrıştırma ve skor mantığını tarayıcı açmadan denemek için `node test
 - Havuzda 3'ten az video kalırsa skor hesaplanmaz, rozet çıkmaz.
 - InnerTube resmi olmayan bir arayüz. YouTube alan adlarını değiştirirse rozet
   kaybolur, sayfa bozulmaz.
-
-Zaman içinde izlenme grafiği **yok**, çünkü YouTube hiçbir video için geçmiş
-izlenme verisi vermiyor. vidIQ ve Social Blade dahil herkes o eğriyi kendi
-topladığı anlık ölçümlerden üretiyor; tek kullanıcılık bir eklentide ancak aylar
-sonra ve yalnızca senin açtığın videolar için oluşurdu. Onun yerine video
-sayfasındaki panelde beklemeden işe yarayan iki şey var: videonun kanal
-dağılımındaki yeri ve günlük ortalama izlenmesi.
