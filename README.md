@@ -16,6 +16,10 @@ No server, no API key, no account: the extension calls YouTube's own internal
 request per channel, cached in `storage.local` for 24 hours by default, and cards
 are only processed once they scroll into view.
 
+![Outlier scores on the YouTube home page](screenshots/home.webp)
+
+![The watch page panel](screenshots/watch-panel.webp)
+
 ## Trying it out
 
 `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → the

@@ -14,6 +14,10 @@ dahili (InnerTube) ucuna oturumsuz istek atar. Kanal başına bir istek, sonucu
 `storage.local` içinde varsayılan 24 saat tutulur, kartlar ancak ekrana girince
 işlenir.
 
+![YouTube ana sayfasında outlier skorları](screenshots/home.webp)
+
+![İzleme sayfasındaki panel](screenshots/watch-panel.webp)
+
 ## Denemek için
 
 `about:debugging#/runtime/this-firefox` → **Geçici Eklenti Yükle** → bu dizindeki
