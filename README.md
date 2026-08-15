@@ -54,4 +54,4 @@ To exercise the parsing and scoring logic without opening a browser, run
 
 ## License
 
-GPL-3.0-or-later. See [LICENSE](LICENSE).
+GPL-3.0-only. See [LICENSE](LICENSE).

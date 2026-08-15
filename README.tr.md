@@ -50,4 +50,4 @@ Ayrıştırma ve skor mantığını tarayıcı açmadan denemek için `node test
 
 ## Lisans
 
-GPL-3.0-or-later. Bkz. [LICENSE](LICENSE).
+GPL-3.0-only. Bkz. [LICENSE](LICENSE).
