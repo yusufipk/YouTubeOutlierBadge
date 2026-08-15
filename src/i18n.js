@@ -35,7 +35,6 @@ var OBI18n = (function () {
       chartMedianLegend: "Kırmızı çizgi: medyan",
       chartSelfLegend: "Turuncu: bu video",
       chartNotInPool: "Bu video kanalın son $1 videosunun içinde değil",
-      chartHint: "Her çubuk bir video, yüksekliği izlenmesi. Üzerine gel, tıkla açılsın.",
       tipViews: "$1 izlenme",
       agoDays: "$1 gün önce",
       agoMonths: "$1 ay önce",
@@ -43,8 +42,6 @@ var OBI18n = (function () {
       tipThisVideo: "bu video",
       panelNoScore: "Skor hesaplanamadı: kanalın bu havuzunda en az $1 video gerekiyor.",
       panelError: "Skor alınamadı: $1",
-      panelNote: "Kanal izlenmeleri YouTube tarafından yuvarlanmış gelir, skor yaklaşıktır. " +
-        "7 günden yeni videoların skoru olduğundan düşük çıkar.",
 
       popupPermission: "Eklentinin YouTube'a istek atma izni yok, rozet çıkmaz.",
       popupGrant: "İzin ver",
@@ -101,7 +98,6 @@ var OBI18n = (function () {
       chartMedianLegend: "Red line: median",
       chartSelfLegend: "Orange: this video",
       chartNotInPool: "This video is not among the channel's last $1",
-      chartHint: "Each bar is a video, its height the view count. Hover for details, click to open.",
       tipViews: "$1 views",
       agoDays: "$1 days ago",
       agoMonths: "$1 months ago",
@@ -109,8 +105,6 @@ var OBI18n = (function () {
       tipThisVideo: "this video",
       panelNoScore: "No score: this channel pool needs at least $1 videos.",
       panelError: "Score unavailable: $1",
-      panelNote: "Channel view counts come rounded from YouTube, so the score is approximate. " +
-        "Videos under 7 days old score lower than they deserve.",
 
       popupPermission: "The extension is not allowed to call YouTube, so no badges appear.",
       popupGrant: "Grant access",

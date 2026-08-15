@@ -86,7 +86,6 @@ var OBPanel = (function () {
     } else {
       legend.appendChild(el("span", null, T.t("chartNotInPool", items.length)));
     }
-    legend.appendChild(el("span", null, T.t("chartHint")));
     wrap.appendChild(legend);
     return wrap;
   }
@@ -170,8 +169,6 @@ var OBPanel = (function () {
       panel.appendChild(el("div", "ob-section-title", T.t("panelDistTitle")));
       panel.appendChild(distribution(pool, data.videoId, data.median));
     }
-
-    panel.appendChild(el("div", "ob-note", T.t("panelNote")));
   }
 
   return { render: render, renderLoading: renderLoading, renderError: renderError, remove: remove };
