@@ -154,7 +154,7 @@
 .ob-tip {
   position: absolute;
   bottom: 100%;
-  transform: translateX(-50%);
+  left: 0;
   max-width: 260px;
   padding: 6px 8px;
   border-radius: 6px;

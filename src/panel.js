@@ -64,10 +64,18 @@ var OBPanel = (function () {
         if (item.id === videoId) meta.push(T.t("tipThisVideo"));
         tip.appendChild(el("div", "ob-tip-meta", meta.join(" · ")));
         tip.hidden = false;
-        /* Balon grafiğin içinde konumlanır, kenarlardan taşmaması için
-         * yatayda kırpılır. */
-        var left = slot.offsetLeft + slot.offsetWidth / 2;
-        tip.style.left = Math.min(Math.max(left, 90), chart.offsetWidth - 90) + "px";
+        /* Balon grafiğin içinde kalmalı. Genişliği içeriğe göre değiştiği için
+         * sabit bir paya göre değil, görünür hale geldikten sonra ölçülen
+         * gerçek genişliğe göre sıkıştırılıyor: kenardaki çubuklarda balon
+         * ortalanmak yerine grafiğin kenarına yaslanır. */
+        var center = slot.offsetLeft + slot.offsetWidth / 2;
+        /* Ölçümden önce sola yaslanıyor: absolute kutunun genişliği kalan
+         * alana göre daraldığı için, önceki hover'dan kalan left değeriyle
+         * ölçmek balonu olduğundan dar gösterirdi. */
+        tip.style.left = "0px";
+        var width = tip.offsetWidth;
+        var maxLeft = Math.max(0, chart.offsetWidth - width);
+        tip.style.left = Math.min(Math.max(center - width / 2, 0), maxLeft) + "px";
       });
       slot.addEventListener("click", function () {
         window.open("https://www.youtube.com/watch?v=" + item.id, "_blank", "noopener");
