@@ -18,10 +18,12 @@ işlenir.
 
 ![İzleme sayfasındaki panel](screenshots/watch-panel.webp)
 
-## Denemek için
+## Kurulum
 
-`about:debugging#/runtime/this-firefox` → **Geçici Eklenti Yükle** → bu dizindeki
-`manifest.json`. Firefox kapanınca kaybolur.
+[addons.mozilla.org'dan yükleyin](https://addons.mozilla.org/tr/firefox/addon/youtube-outlier-badge/).
+Bunun yerine buradaki kodu çalıştırmak için: `about:debugging#/runtime/this-firefox`
+→ **Geçici Eklenti Yükle** → bu dizindeki `manifest.json`, Firefox kapanınca
+kaybolur.
 
 ## Kullanım
 

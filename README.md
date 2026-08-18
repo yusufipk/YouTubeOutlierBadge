@@ -20,10 +20,12 @@ are only processed once they scroll into view.
 
 ![The watch page panel](screenshots/watch-panel.webp)
 
-## Trying it out
+## Installing
 
-`about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → the
-`manifest.json` in this directory. It disappears when Firefox closes.
+[Get it from addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/youtube-outlier-badge/).
+To run this checkout instead: `about:debugging#/runtime/this-firefox` → **Load
+Temporary Add-on** → the `manifest.json` here, which disappears when Firefox
+closes.
 
 ## Using it
 
