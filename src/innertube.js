@@ -297,16 +297,30 @@ var OBTube = (function () {
   }
 
   /* Videonun kanal kimliği ve tam izlenme sayısı. Kartta kanal bağlantısı
-   * bulunamadığında son çare olarak kullanılır: video başına bir istek. */
+   * bulunamadığında son çare olarak kullanılır: video başına bir istek.
+   *
+   * Buna `player` ucu daha uygun görünür ve bir zamanlar öyleydi; oturum
+   * bilgisi göndermediğimiz için artık videoların büyük çoğunluğunda
+   * LOGIN_REQUIRED ("Sign in to confirm you're not a bot") dönüyor ve
+   * videoDetails hiç gelmiyor. `next` aynı iki alanı oturumsuz da veriyor.
+   * Yanıt büyük olduğu için bu uç bilerek son çare, ilk seçenek değil. */
   function videoDetails(videoId) {
-    return post("player", { videoId: videoId }).then(function (data) {
-      var d = data.videoDetails || {};
+    return post("next", { videoId: videoId }).then(function (data) {
+      var owner = P.findFirst(data, "videoOwnerRenderer") || {};
+      var endpoint = P.findFirst(owner, "browseEndpoint") || {};
+      var channelId = endpoint.browseId || "";
+      var counter = P.findFirst(data, "videoViewCountRenderer") || {};
+      /* viewCount tam sayıyı verir ("63,087 views"); yoksa kısaltılmışa düş.
+       * Süren canlı yayında aynı alan "12,345 watching now" der; bu izlenme
+       * değil anlık izleyicidir, sayı sanılırsa skor uydurma çıkar. */
+      var countText = P.textOf(counter.viewCount) || P.textOf(counter.shortViewCount);
+      var views = /watching/i.test(countText) ? null : P.parseCountEn(countText);
+      var primary = P.findFirst(data, "videoPrimaryInfoRenderer") || {};
       return {
-        channelId: d.channelId || null,
-        views: d.viewCount ? parseInt(d.viewCount, 10) : null,
-        title: d.title || "",
-        lengthSeconds: d.lengthSeconds ? parseInt(d.lengthSeconds, 10) : null,
-        isLive: !!d.isLiveContent
+        channelId: /^UC[\w-]{22}$/.test(channelId) ? channelId : null,
+        views: views,
+        title: P.textOf(primary.title),
+        publishedText: P.textOf(primary.dateText)
       };
     });
   }

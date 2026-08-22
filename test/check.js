@@ -98,6 +98,7 @@ eq(tiny.score, null, "3'ten az örnek: skor yok");
 
 console.log("\n--- gerçek InnerTube çağrısı ---");
 const CHANNEL = process.argv[2] || "UCXuqSBlHAE6Xw-yeJA0Tunw"; /* Linus Tech Tips */
+let probe = null;   /* videoDetails'ı sınamak için kanalın güncel bir videosu */
 OBTube.channelTab(CHANNEL, "videos", 30).then((items) => {
   console.log("videos sekmesi: " + items.length + " video");
   const withViews = items.filter((v) => v.views);
@@ -108,6 +109,7 @@ OBTube.channelTab(CHANNEL, "videos", 30).then((items) => {
     console.log("  " + v.videoId + " | " + OBParse.humanCount(v.views) + " | " +
       (v.ageDays == null ? "?" : v.ageDays.toFixed(1) + " gün") + " | " + v.title.slice(0, 50));
   }
+  probe = withViews.length ? withViews[0] : null;
   const views = withViews.map((v) => v.views);
   console.log("medyan: " + OBParse.humanCount(OBParse.median(views)));
   if (withViews.length < 10) { fails++; console.log("FAIL izlenmesi çözülen video sayısı çok düşük"); }
@@ -118,10 +120,15 @@ OBTube.channelTab(CHANNEL, "videos", 30).then((items) => {
   return OBTube.resolveChannel("@LinusTechTips");
 }).then((id) => {
   eq(id, CHANNEL, "handle -> kanal kimliği");
-  return OBTube.videoDetails("dQw4w9WgXcQ");
+  /* Bilerek kanalın güncel bir videosu: sabit bir klasik ("dQw4w9WgXcQ")
+   * YouTube tarafında ayrıcalıklı davranıp uç bozulduğunda bile yanıt
+   * verebiliyor ve testi yanlış yere yeşil gösteriyordu. */
+  if (!probe) { fails++; console.log("FAIL sınanacak video bulunamadı"); return {}; }
+  return OBTube.videoDetails(probe.videoId);
 }).then((d) => {
-  console.log("player ucu: kanal " + d.channelId + ", izlenme " + OBParse.humanCount(d.views));
-  if (!d.channelId) { fails++; console.log("FAIL player ucu kanal kimliği vermedi"); }
+  console.log("video ucu: kanal " + d.channelId + ", izlenme " + OBParse.humanCount(d.views));
+  eq(d.channelId, CHANNEL, "video ucu kanal kimliği");
+  if (!d.views) { fails++; console.log("FAIL video ucu izlenme vermedi"); }
   console.log(fails ? "\n" + fails + " test başarısız" : "\nhepsi geçti");
   process.exit(fails ? 1 : 0);
 }).catch((e) => {
