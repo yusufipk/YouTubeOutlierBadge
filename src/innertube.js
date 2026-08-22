@@ -268,32 +268,47 @@ var OBTube = (function () {
     return post("browse", { browseId: channelId, params: params }).then(round);
   }
 
+  function channelIdIn(url) {
+    if (!url || url.indexOf("/channel/") < 0) return null;
+    var tail = url.split("/channel/")[1].split("/")[0].split("?")[0];
+    return /^UC[\w-]{22}$/.test(tail) ? tail : null;
+  }
+
+  /* Tek istekte bitmeyebilir: eski özel adresi olan kanallarda YouTube
+   * @handle'ı önce youtube.com/eskiad adresine yolluyor, kanal kimliği ancak
+   * bir sonraki adımda geliyor. Zincir kısa, sıçrama sayısı sınırlı: hem
+   * döngüye girmeyelim hem de tek kart için istek yağdırmayalım. */
+  var MAX_RESOLVE_HOPS = 3;
+
+  function resolveStep(url, raw, hops) {
+    return post("navigation/resolve_url", { url: url }).then(function (data) {
+      var endpoint = P.findFirst(data, "browseEndpoint") || {};
+      var id = endpoint.browseId || "";
+      if (/^UC[\w-]{22}$/.test(id)) return id;
+      var next = (P.findFirst(data, "urlEndpoint") || {}).url || "";
+      var direct = channelIdIn(next);
+      if (direct) return direct;
+      /* Sadece YouTube içinde kalan yönlendirmeler izlenir. */
+      var internal = /^https?:\/\/(www\.)?youtube\.com\//.test(next);
+      if (internal && next !== url && hops < MAX_RESOLVE_HOPS) {
+        return resolveStep(next, raw, hops + 1);
+      }
+      throw new Error("kanal çözülemedi: " + raw);
+    });
+  }
+
   /* @handle veya kanal adresini UC... kimliğine çevirir. */
   function resolveChannel(raw) {
     raw = (raw || "").trim();
     if (!raw) return Promise.reject(new Error("boş kanal adresi"));
     if (/^UC[\w-]{22}$/.test(raw)) return Promise.resolve(raw);
-    if (raw.indexOf("/channel/") >= 0) {
-      var tail = raw.split("/channel/")[1].split("/")[0].split("?")[0];
-      if (tail.indexOf("UC") === 0) return Promise.resolve(tail);
-    }
+    var direct = channelIdIn(raw);
+    if (direct) return Promise.resolve(direct);
     var url = raw;
     if (url.indexOf("http") !== 0) {
       url = "https://www.youtube.com/" + (url.charAt(0) === "@" ? url : "@" + url.replace(/^\/+/, ""));
     }
-    return post("navigation/resolve_url", { url: url }).then(function (data) {
-      var endpoint = P.findFirst(data, "browseEndpoint") || {};
-      var id = endpoint.browseId || "";
-      if (id.indexOf("UC") === 0) return id;
-      /* Eski /user/ adresi olan kanallarda YouTube browseEndpoint yerine
-       * urlEndpoint ile başka bir adrese yolluyor. */
-      var next = (P.findFirst(data, "urlEndpoint") || {}).url || "";
-      if (next.indexOf("/channel/") >= 0) {
-        var t = next.split("/channel/")[1].split("/")[0].split("?")[0];
-        if (t.indexOf("UC") === 0) return t;
-      }
-      throw new Error("kanal çözülemedi: " + raw);
-    });
+    return resolveStep(url, raw, 0);
   }
 
   /* Videonun kanal kimliği ve tam izlenme sayısı. Kartta kanal bağlantısı

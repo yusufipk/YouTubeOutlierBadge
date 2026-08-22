@@ -120,6 +120,13 @@ OBTube.channelTab(CHANNEL, "videos", 30).then((items) => {
   return OBTube.resolveChannel("@LinusTechTips");
 }).then((id) => {
   eq(id, CHANNEL, "handle -> kanal kimliği");
+  return OBTube.resolveChannel("@MesutCevik");
+}).then((id) => {
+  /* Eski özel adresi olan bir kanal: YouTube @handle'ı önce
+   * youtube.com/mesutcevik adresine yolluyor, kimlik ancak ikinci adımda
+   * geliyor. Tek adımda çözen kod bu kanallarda "kanal çözülemedi" veriyor ve
+   * o kanalın hiçbir kartı puanlanmıyordu. */
+  eq(id, "UCOFafpmI_dt8SxisbKniN4A", "yönlendirmeli handle -> kanal kimliği");
   /* Bilerek kanalın güncel bir videosu: sabit bir klasik ("dQw4w9WgXcQ")
    * YouTube tarafında ayrıcalıklı davranıp uç bozulduğunda bile yanıt
    * verebiliyor ve testi yanlış yere yeşil gösteriyordu. */
