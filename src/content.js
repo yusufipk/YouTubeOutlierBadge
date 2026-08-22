@@ -107,20 +107,31 @@
   }
 
   /* Handle'dan kanal kimliğine çözüm kalıcıdır (değişmez), o yüzden TTL'siz
-   * saklanır. İzleme sayfasının yan listesinde kartta kanal bağlantısı hiç
+   * saklanır. Arama sonuçlarında aynı kanaldan onlarca kart aynı anda ekrana
+   * giriyor ve depo okuması asenkron olduğu için hepsi önbelleği ıskalayıp
+   * aynı çözümü ayrı ayrı isterdi; devam eden istek paylaşılıyor. */
+  var resolving = {};
+
+  function resolveHandle(handle) {
+    if (resolving[handle]) return resolving[handle];
+    var promise = OBStore.readChannelId(handle).then(function (cached) {
+      if (cached) return cached;
+      return OBTube.resolveChannel(handle).then(function (id) {
+        OBStore.writeChannelId(handle, id);
+        return id;
+      });
+    });
+    resolving[handle] = promise;
+    promise.catch(function () {}).then(function () { delete resolving[handle]; });
+    return promise;
+  }
+
+  /* İzleme sayfasının yan listesinde kartta kanal bağlantısı hiç
    * olmayabiliyor; orada son çare videonun kendi ucundan sorulur. */
   function channelIdOf(card, videoId) {
     var found = handleOf(card) || pageChannel();
     if (found && found.channelId) return Promise.resolve(found.channelId);
-    if (found && found.handle) {
-      return OBStore.readChannelId(found.handle).then(function (cached) {
-        if (cached) return cached;
-        return OBTube.resolveChannel(found.handle).then(function (id) {
-          OBStore.writeChannelId(found.handle, id);
-          return id;
-        });
-      });
-    }
+    if (found && found.handle) return resolveHandle(found.handle);
     var key = "v:" + videoId;
     return OBStore.readChannelId(key).then(function (cached) {
       if (cached) return cached;
