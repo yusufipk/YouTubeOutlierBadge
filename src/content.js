@@ -91,11 +91,26 @@
 
   /* --- Kanal kimliği --------------------------------------------------- */
 
+  /* Kanal sayfasındaki kartlarda kanal bağlantısı hiç bulunmuyor: zaten o
+   * kanaldasın, YouTube adı kartta tekrar etmiyor. O kartların kanalı sayfanın
+   * kendi adresidir, video başına ayrı bir istek atmaya gerek yok. */
+  function pageChannel() {
+    var path = location.pathname;
+    var m = /^\/channel\/(UC[\w-]{22})(?:\/|$)/.exec(path);
+    if (m) return { channelId: m[1] };
+    m = /^\/(@[\w.\-]+)(?:\/|$)/.exec(path);
+    if (m) return { handle: m[1] };
+    /* Eski /c/ ve /user/ adresleri: çözüm için tam adres gerekiyor. */
+    m = /^\/((?:c|user)\/[^/]+)(?:\/|$)/.exec(path);
+    if (m) return { handle: location.origin + "/" + m[1] };
+    return null;
+  }
+
   /* Handle'dan kanal kimliğine çözüm kalıcıdır (değişmez), o yüzden TTL'siz
    * saklanır. İzleme sayfasının yan listesinde kartta kanal bağlantısı hiç
    * olmayabiliyor; orada son çare videonun kendi ucundan sorulur. */
   function channelIdOf(card, videoId) {
-    var found = handleOf(card);
+    var found = handleOf(card) || pageChannel();
     if (found && found.channelId) return Promise.resolve(found.channelId);
     if (found && found.handle) {
       return OBStore.readChannelId(found.handle).then(function (cached) {
@@ -166,6 +181,16 @@
     return m ? m[1] : null;
   }
 
+  /* Videonun süresi InnerTube'un next yanıtında yok, sayfanın oynatıcısından
+   * okunuyor. Okunamazsa normal video sayılır: /watch adresinde açılan bir
+   * Short nadir, yanlış havuzda puanlamaktansa gecikmeli doğruyu beklemek
+   * anlamsız olurdu. */
+  function watchIsShort() {
+    if (location.pathname.indexOf("/shorts/") === 0) return true;
+    var v = document.querySelector("#movie_player video");
+    return !!(v && isFinite(v.duration) && v.duration > 0 && v.duration <= 60);
+  }
+
   function updatePanel() {
     if (!settings || !settings.enabled || !settings.showPanel) { OBPanel.remove(); return; }
     var videoId = currentWatchId();
@@ -179,7 +204,7 @@
       details = d;
       if (!d.channelId) throw new Error("kanal bulunamadı");
       OBStore.writeChannelId("v:" + videoId, d.channelId);
-      var isShort = d.lengthSeconds != null && d.lengthSeconds <= 60;
+      var isShort = watchIsShort();
       return OBScore.baseline(d.channelId, isShort).then(function (blob) {
         return { blob: blob, isShort: isShort };
       });
