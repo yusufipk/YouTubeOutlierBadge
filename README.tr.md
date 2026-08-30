@@ -8,6 +8,10 @@ bilerek seçildi: tek bir viral video ortalamayı yukarı çekip aynı kanalın 
 videolarını "outlier değil" gösterirdi. Shorts kendi havuzunda, normal videolar
 kendi havuzunda puanlanır, canlı yayınlar hiçbir havuza girmez. Video sayfasında
 ayrıca skorun ayrıntısı ve kanalın son videolarının izlenme dağılımı görünür.
+Rozete tıklamak küçük bir menü açar: kapak ve başlığı panoya kopyala, kapağı
+indir ya da videoyu eklentinin kendi kütüphanesine kaydet; kütüphanede kayıtlar
+projelere ayrılır, JSON olarak dışa ve içe aktarılır, skorlar sayfa açılınca
+tazelenir.
 
 Sunucu, API anahtarı, hesap yok: eklenti youtube.com içinden YouTube'un kendi
 dahili (InnerTube) ucuna oturumsuz istek atar. Kanal başına bir istek, sonucu
@@ -17,6 +21,10 @@ işlenir.
 ![YouTube ana sayfasında outlier skorları](screenshots/home.webp)
 
 ![İzleme sayfasındaki panel](screenshots/watch-panel.webp)
+
+![Rozet menüsü](screenshots/badge-menu.webp)
+
+![Kütüphane sayfası](screenshots/library.webp)
 
 ## Kurulum
 

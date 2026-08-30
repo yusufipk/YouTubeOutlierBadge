@@ -8,6 +8,10 @@
   position: absolute;
   right: 4px;
   bottom: 30px;
+  /* Mütevazı kalmalı: yüksek bir değer rozeti YouTube'un kendi katmanlarının
+     (açıklama penceresi gibi dialoglar ~2200) üstüne taşırıyor. Hover
+     önizlemesinin üstünde kalma işi kartın içindeki bu rozetin değil,
+     body'ye basılan hayalet kopyanın. */
   z-index: 20;
   min-width: 34px;
   padding: 3px 7px;
@@ -18,14 +22,21 @@
   background: rgba(0, 0, 0, 0.78);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   pointer-events: auto;
-  cursor: default;
+  cursor: pointer;
   white-space: nowrap;
 }
 
-/* Shorts kapağının altı izlenme metniyle dolu, orada rozet üste gider. */
-.ob-badge.ob-short {
-  top: 6px;
+.ob-badge:hover {
+  outline: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+/* Hayalet rozet: hover önizleme katmanının üstünde duran fixed kopya;
+   left/top JS'ten inline verilir. */
+.ob-badge.ob-ghost {
+  position: fixed;
+  right: auto;
   bottom: auto;
+  z-index: 2147483647;
 }
 
 .ob-badge.ob-loading {
@@ -51,6 +62,39 @@
 .ob-t2 { background: rgba(21, 128, 61, 0.92); }
 .ob-t3 { background: rgba(180, 83, 9, 0.94); }
 .ob-t4 { background: rgba(159, 18, 57, 0.95); }
+
+/* --- Rozet menüsü --- */
+
+/* Menü de rozet gibi tema bağımsız koyu: sayfanın her yerinde aynı görünür. */
+.ob-menu {
+  position: fixed;
+  z-index: 2147483000;
+  min-width: 190px;
+  padding: 5px;
+  border-radius: 9px;
+  background: #212121;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  font-family: "Roboto", "Segoe UI", sans-serif;
+}
+
+.ob-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 11px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #eee;
+  font: 500 13px/1.3 inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ob-menu-item:hover:not(:disabled) { background: rgba(255, 255, 255, 0.12); }
+.ob-menu-item:disabled { color: #9aa0a6; cursor: default; }
 
 /* --- Izleme sayfasi paneli --- */
 

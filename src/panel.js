@@ -139,21 +139,13 @@ var OBPanel = (function () {
     panel.appendChild(el("div", "ob-note", message));
   }
 
-  function tone(score) {
-    return score >= 10 ? "ob-t4" : score >= 5 ? "ob-t3"
-      : score >= 2 ? "ob-t2" : score >= 1 ? "ob-t1" : "ob-t0";
-  }
-
   function render(data) {
     var panel = mount();
     if (!panel) return;
     panel.textContent = "";
 
     var head = el("div", "ob-panel-head");
-    var scoreText = data.score >= 10
-      ? Math.round(data.score) + "x"
-      : T.num(Math.round(data.score * 10) / 10, 1) + "x";
-    head.appendChild(el("span", "ob-chip " + tone(data.score), scoreText));
+    head.appendChild(el("span", "ob-chip " + P.scoreTone(data.score), P.scoreLabel(data.score)));
     head.appendChild(el("span", "ob-head-text", T.t("panelHead")));
     panel.appendChild(head);
 

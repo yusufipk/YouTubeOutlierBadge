@@ -133,9 +133,27 @@ var OBParse = (function () {
     return String(Math.round(n));
   }
 
+  /* Skor -> renk sınıfı ve "2,4x" etiketi. Rozet, izleme paneli ve kütüphane
+   * aynı eşikleri ve yuvarlamayı kullanır; tek kopya burada durur ki eşik
+   * değişince üçü birden değişsin. */
+  function scoreTone(score) {
+    if (score == null) return null;
+    return score >= 10 ? "ob-t4" : score >= 5 ? "ob-t3"
+      : score >= 2 ? "ob-t2" : score >= 1 ? "ob-t1" : "ob-t0";
+  }
+
+  function scoreLabel(score) {
+    if (score >= 10) return Math.round(score) + "x";
+    var rounded = Math.round(score * 10) / 10;
+    if (typeof OBI18n === "undefined") return rounded.toFixed(1) + "x";
+    return OBI18n.num(rounded, 1) + "x";
+  }
+
   return {
     findAll: findAll,
     findFirst: findFirst,
+    scoreTone: scoreTone,
+    scoreLabel: scoreLabel,
     textOf: textOf,
     parseCountEn: parseCountEn,
     parseCountUI: parseCountUI,

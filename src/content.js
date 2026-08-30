@@ -146,12 +146,21 @@
 
   function processCard(card) {
     var videoId = videoIdOf(card);
-    if (!videoId) return;
+    /* Erken dönüşlerin hepsi obBadged'i düşürmek zorunda: bayrak yüksek ama
+     * rozet yok kalırsa scan()'in geri basma dalı kartı her turda yeniden
+     * işleyen bir döngüye girer. */
+    if (!videoId) { card.obBadged = false; return; }
     if (card.obVideoId === videoId) return;
     card.obVideoId = videoId;
+    card.obScore = null;
+    card.obViews = null;
 
     var isShort = isShortCard(card);
-    if (isShort && !settings.scoreShorts) { OBBadge.clear(card); return; }
+    if (isShort && !settings.scoreShorts) {
+      card.obBadged = false;
+      OBBadge.clear(card);
+      return;
+    }
 
     counters.seen++;
     OBBadge.loading(card);
@@ -166,19 +175,26 @@
       var result = OBScore.score(videoId, views, isShort, blob);
       if (result.score == null) {
         counters.skipped++;
+        card.obBadged = false;
         OBBadge.clear(card);
         return;
       }
       if (settings.minScore && result.score < settings.minScore) {
+        card.obBadged = false;
         OBBadge.clear(card);
         return;
       }
       var age = own && own.age != null ? own.age : domAgeDays(card);
+      /* Rozet menüsü kaydederken skoru da yazsın diye kartta saklanır. */
+      card.obScore = result.score;
+      card.obViews = result.views;
       counters.scored++;
+      card.obBadged = true;
       OBBadge.show(card, result, { young: age != null && age < 7, isShort: isShort });
     }).catch(function (err) {
       counters.failed++;
       lastError = String(err && err.message ? err.message : err);
+      card.obBadged = false;
       OBBadge.clear(card);
     });
   }
@@ -261,6 +277,13 @@
         /* YouTube kartları geri dönüştürüyor: aynı DOM elemanı başka videoya
          * bağlıysa rozet eskimiş demektir. */
         processCard(card);
+      } else if (card.obBadged && !OBBadge.present(card)) {
+        /* Hover önizlemesi (özellikle Shorts'ta) kapak kutusunu yeniden
+         * kuruyor ve rozet DOM'dan siliniyor. Baseline önbellekte, geri
+         * basmak ucuz. obVideoId sıfırlanır ki processCard "zaten işledim"
+         * deyip erken dönmesin. */
+        card.obVideoId = null;
+        processCard(card);
       }
     }
   }
@@ -276,6 +299,7 @@
     for (var i = 0; i < cards.length; i++) {
       OBBadge.clear(cards[i]);
       cards[i].obVideoId = null;
+      cards[i].obBadged = false;
     }
     OBPanel.remove();
     panelVideoId = null;

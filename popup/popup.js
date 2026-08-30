@@ -5,6 +5,9 @@
 
   var api = (typeof browser !== "undefined" ? browser : chrome);
   var T = OBI18n;
+  /* Sadece youtube.com: kapaklar (i.ytimg.com) ACAO:* gönderdiği için host
+   * izni istemez ve buraya eklemek, sadece youtube iznini vermiş mevcut
+   * kullanıcılara güncellemede yersiz bir uyarı gösterirdi. */
   var ORIGINS = { origins: ["*://www.youtube.com/*"] };
 
   var FIELDS = [
@@ -106,6 +109,11 @@
           if (f[0] === "language") refresh();
         });
       });
+    });
+
+    $("library").addEventListener("click", function () {
+      api.tabs.create({ url: api.runtime.getURL("library/library.html") });
+      window.close();
     });
 
     $("clear").addEventListener("click", function () {

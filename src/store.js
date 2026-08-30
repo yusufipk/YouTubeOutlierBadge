@@ -116,6 +116,58 @@ var OBStore = (function () {
     return set(payload);
   }
 
+  /* --- Kütüphane ------------------------------------------------------- */
+
+  /* Kütüphane bellekte önbelleklenmez: kütüphane sayfası ile açık YouTube
+   * sekmeleri aynı veriyi düzenliyor, bayat kopya yanlış "ekli/değil" gösterir.
+   * Erişim seyrek (menü açılışı, kayıt), her seferinde depodan okumak ucuz. */
+  var LIBRARY_KEY = "library";
+
+  function readLibrary() {
+    return get(LIBRARY_KEY).then(function (r) {
+      var lib = r[LIBRARY_KEY] || {};
+      return {
+        v: 1,
+        projects: Array.isArray(lib.projects) ? lib.projects : [],
+        items: Array.isArray(lib.items) ? lib.items : []
+      };
+    });
+  }
+
+  function writeLibrary(lib) {
+    var payload = {};
+    payload[LIBRARY_KEY] = lib;
+    return set(payload);
+  }
+
+  /* Aynı video ikinci kez eklenirse eski kaydın yerine geçer (tek girdi,
+   * proje bilgisi korunur), listenin başına alınır. */
+  function libraryAdd(item) {
+    return readLibrary().then(function (lib) {
+      var old = null;
+      lib.items = lib.items.filter(function (it) {
+        if (it.videoId === item.videoId) { old = it; return false; }
+        return true;
+      });
+      if (old && item.projectId == null) item.projectId = old.projectId;
+      lib.items.unshift(item);
+      return writeLibrary(lib).then(function () { return lib; });
+    });
+  }
+
+  function libraryRemove(videoId) {
+    return readLibrary().then(function (lib) {
+      lib.items = lib.items.filter(function (it) { return it.videoId !== videoId; });
+      return writeLibrary(lib);
+    });
+  }
+
+  function libraryHas(videoId) {
+    return readLibrary().then(function (lib) {
+      return lib.items.some(function (it) { return it.videoId === videoId; });
+    });
+  }
+
   function clearBaselines() {
     mem = {};
     return get("blIndex").then(function (r) {
@@ -139,6 +191,11 @@ var OBStore = (function () {
     writeBaseline: writeBaseline,
     readChannelId: readChannelId,
     writeChannelId: writeChannelId,
+    readLibrary: readLibrary,
+    writeLibrary: writeLibrary,
+    libraryAdd: libraryAdd,
+    libraryRemove: libraryRemove,
+    libraryHas: libraryHas,
     clearBaselines: clearBaselines,
     stats: stats
   };

@@ -9,7 +9,10 @@ would drag a mean upward and make everything else on that channel look like it
 never outperformed. Shorts are scored against the channel's Shorts, regular
 videos against regular videos, and live streams enter no pool at all. The watch
 page also gets a panel with the score's details and the channel's recent view
-distribution.
+distribution. Clicking a badge opens a small menu to copy the thumbnail and
+title, download the thumbnail, or save the video into the extension's own
+library, where entries live in projects, can be exported and imported as JSON,
+and get their scores refreshed when the page opens.
 
 No server, no API key, no account: the extension calls YouTube's own internal
 (InnerTube) endpoint from inside youtube.com, without session credentials. One
@@ -19,6 +22,10 @@ are only processed once they scroll into view.
 ![Outlier scores on the YouTube home page](screenshots/home.webp)
 
 ![The watch page panel](screenshots/watch-panel.webp)
+
+![The badge menu](screenshots/badge-menu.webp)
+
+![The library page](screenshots/library.webp)
 
 ## Installing
 

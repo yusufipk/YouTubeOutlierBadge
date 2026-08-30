@@ -1,0 +1,238 @@
+/* Kütüphane sayfası: ayar penceresiyle aynı koyu palet. */
+
+* { box-sizing: border-box; }
+
+body {
+  display: flex;
+  min-height: 100vh;
+  margin: 0;
+  font: 13px/1.45 "Segoe UI", Roboto, sans-serif;
+  color: #eee;
+  background: #202124;
+}
+
+/* --- Kenar çubuğu --- */
+
+#sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 230px;
+  flex-shrink: 0;
+  padding: 16px 12px;
+  border-right: 1px solid #3c4043;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+h1 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+#projects {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.nav-row:hover { background: #2b2c2f; }
+.nav-row.active { background: #3c4043; }
+
+.nav-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-count { color: #9aa0a6; font-size: 12px; }
+
+.nav-act {
+  display: none;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: #9aa0a6;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nav-row:hover .nav-act { display: inline; }
+.nav-act:hover { color: #eee; }
+
+.nav-edit {
+  width: 100%;
+  padding: 3px 6px;
+  border: 1px solid #4a4a4a;
+  border-radius: 4px;
+  background: #303134;
+  color: #eee;
+  font: inherit;
+}
+
+button {
+  background: #303134;
+  color: #eee;
+  border: 1px solid #4a4a4a;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) { background: #3c4043; }
+button:disabled { color: #9aa0a6; cursor: default; }
+
+#newProject, #refresh { text-align: left; }
+
+.io { display: flex; gap: 6px; margin-top: auto; }
+.io button { flex: 1; }
+
+#notice { color: #9aa0a6; font-size: 12px; min-height: 1em; }
+
+/* --- Ana alan --- */
+
+main {
+  flex: 1;
+  padding: 16px 18px;
+  min-width: 0;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+#search {
+  flex: 1;
+  max-width: 340px;
+  padding: 6px 10px;
+  border: 1px solid #4a4a4a;
+  border-radius: 6px;
+  background: #303134;
+  color: #eee;
+  font: inherit;
+}
+
+#count { color: #9aa0a6; }
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+#empty { color: #9aa0a6; }
+
+/* --- Video kartı --- */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #3c4043;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #26272b;
+}
+
+.thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.chip {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  background: rgba(0, 0, 0, 0.78);
+}
+
+/* Rozetle aynı ton skalası. */
+.ob-t0 { background: rgba(60, 60, 60, 0.82); color: #d0d0d0; }
+.ob-t1 { background: rgba(29, 92, 168, 0.9); }
+.ob-t2 { background: rgba(21, 128, 61, 0.92); }
+.ob-t3 { background: rgba(180, 83, 9, 0.94); }
+.ob-t4 { background: rgba(159, 18, 57, 0.95); }
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 11px 11px;
+}
+
+.card-title {
+  color: #eee;
+  text-decoration: none;
+  font-weight: 500;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-title:hover { text-decoration: underline; }
+
+.card-meta { color: #9aa0a6; font-size: 12px; }
+
+.card-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.card-move {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid #4a4a4a;
+  border-radius: 4px;
+  background: #303134;
+  color: #eee;
+  font: inherit;
+  font-size: 12px;
+}
+
+.card-act {
+  padding: 3px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.card-del:hover { background: #5c2b29; border-color: #7a3a37; }
+
+/* İki adımlı silmenin ikinci adımı: düğme kızarır, tık onaydır. */
+.card-act.armed,
+.card-act.armed:hover { background: #5c2b29; border-color: #a15551; color: #ffd8d5; }
+
+.nav-act.armed { display: inline; color: #f28b82; font-weight: 600; }

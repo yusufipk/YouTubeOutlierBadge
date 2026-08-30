@@ -16,7 +16,7 @@ import sys
 import zipfile
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-INCLUDE_DIRS = ["src", "popup", "icons", "_locales"]
+INCLUDE_DIRS = ["src", "popup", "library", "icons", "_locales"]
 INCLUDE_FILES = ["manifest.json", "LICENSE"]  # GPL kopyası pakette de bulunmalı
 OUTPUT = "outlier-badge.zip"
 
@@ -31,7 +31,7 @@ def check_syntax():
     """node varsa her JS dosyasını ayrıştırmayı dene: bozuk bir dosyayı
     AMO'ya yükleyip incelemede öğrenmek yerine burada görelim."""
     files = []
-    for d in ["src", "popup"]:
+    for d in ["src", "popup", "library"]:
         for root, _, names in os.walk(os.path.join(ROOT, d)):
             files += [os.path.join(root, n) for n in names if n.endswith(".js")]
     try:

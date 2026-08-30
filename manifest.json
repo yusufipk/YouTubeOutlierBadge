@@ -13,7 +13,7 @@
       }
     }
   },
-  "permissions": ["storage"],
+  "permissions": ["storage", "clipboardWrite"],
   "host_permissions": ["*://www.youtube.com/*"],
   "content_scripts": [
     {
@@ -24,6 +24,8 @@
         "src/innertube.js",
         "src/store.js",
         "src/score.js",
+        "src/actions.js",
+        "src/menu.js",
         "src/badge.js",
         "src/panel.js",
         "src/content.js"
