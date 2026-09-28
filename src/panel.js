@@ -105,17 +105,28 @@ var OBPanel = (function () {
     return r;
   }
 
-  function mount() {
-    var anchor = document.querySelector("ytd-watch-metadata #above-the-fold")
+  function anchor() {
+    return document.querySelector("ytd-watch-metadata #above-the-fold")
       || document.querySelector("ytd-watch-metadata")
       || document.querySelector("#secondary-inner");
-    if (!anchor) return null;
+  }
+
+  /* Panel var ve şu an mümkün olan en iyi yerde mi. Arka plan sekmesinde
+   * önce yedek yere düşen panel, asıl yer çizilince buna göre taşınır. */
+  function placed() {
     var existing = document.getElementById("ob-panel");
-    if (existing && existing.parentElement === anchor) return existing;
+    return !!existing && existing.parentElement === anchor();
+  }
+
+  function mount() {
+    var anchor_ = anchor();
+    if (!anchor_) return null;
+    var existing = document.getElementById("ob-panel");
+    if (existing && existing.parentElement === anchor_) return existing;
     if (existing) existing.remove();
     var panel = el("div", "ob-panel");
     panel.id = "ob-panel";
-    anchor.appendChild(panel);
+    anchor_.appendChild(panel);
     return panel;
   }
 
@@ -171,5 +182,5 @@ var OBPanel = (function () {
     }
   }
 
-  return { render: render, renderLoading: renderLoading, renderError: renderError, remove: remove };
+  return { render: render, renderLoading: renderLoading, renderError: renderError, remove: remove, placed: placed };
 })();

@@ -202,6 +202,19 @@
   /* --- İzleme sayfası panosu ------------------------------------------- */
 
   var panelVideoId = null;
+  /* Panelin son hali. Orta tuşla arka planda açılan sekmede YouTube, sekme
+   * görünür olana kadar ytd-watch-metadata'yı çizmiyor; o anda mount() yer
+   * bulamıyor ya da panel yedek yere düşüyor. Metadata bloğu sonradan yeniden kurulup
+   * paneli silebiliyor da. İkisinde de istek tekrarlanmadan bu hal yeniden
+   * basılır. */
+  var panelState = null;
+
+  function drawPanel() {
+    if (!panelState) return;
+    if (panelState.kind === "data") OBPanel.render(panelState.data);
+    else if (panelState.kind === "error") OBPanel.renderError(panelState.message);
+    else OBPanel.renderLoading();
+  }
 
   function currentWatchId() {
     var m = /[?&]v=([\w-]{11})/.exec(location.search);
@@ -221,11 +234,15 @@
   function updatePanel() {
     if (!settings || !settings.enabled || !settings.showPanel) { OBPanel.remove(); return; }
     var videoId = currentWatchId();
-    if (!videoId) { panelVideoId = null; OBPanel.remove(); return; }
-    if (videoId === panelVideoId) return;
+    if (!videoId) { panelVideoId = null; panelState = null; OBPanel.remove(); return; }
+    if (videoId === panelVideoId) {
+      if (!OBPanel.placed()) drawPanel();
+      return;
+    }
     panelVideoId = videoId;
 
-    OBPanel.renderLoading();
+    panelState = { kind: "loading" };
+    drawPanel();
     var details = null;
     OBTube.videoDetails(videoId).then(function (d) {
       details = d;
@@ -240,10 +257,11 @@
       var own = OBScore.lookupViews(videoId, ctx.blob);
       var result = OBScore.score(videoId, details.views, ctx.isShort, ctx.blob);
       if (result.score == null) {
-        OBPanel.renderError(T.t("panelNoScore", OBScore.MIN_SAMPLE));
+        panelState = { kind: "error", message: T.t("panelNoScore", OBScore.MIN_SAMPLE) };
+        drawPanel();
         return;
       }
-      OBPanel.render({
+      panelState = { kind: "data", data: {
         videoId: videoId,
         score: result.score,
         views: result.views,
@@ -253,11 +271,13 @@
         ageDays: own ? own.age : null,
         isShort: ctx.isShort,
         blob: ctx.blob
-      });
+      } };
+      drawPanel();
     }).catch(function (err) {
       if (panelVideoId !== videoId) return;
       lastError = String(err && err.message ? err.message : err);
-      OBPanel.renderError(T.t("panelError", lastError));
+      panelState = { kind: "error", message: T.t("panelError", lastError) };
+      drawPanel();
     });
   }
 
@@ -291,7 +311,7 @@
   var scanTimer = null;
   function scheduleScan() {
     if (scanTimer) return;
-    scanTimer = setTimeout(function () { scanTimer = null; scan(); }, 250);
+    scanTimer = setTimeout(function () { scanTimer = null; scan(); updatePanel(); }, 250);
   }
 
   function clearAll() {
@@ -303,6 +323,7 @@
     }
     OBPanel.remove();
     panelVideoId = null;
+    panelState = null;
   }
 
   function start() {
@@ -320,6 +341,9 @@
     document.addEventListener("yt-page-data-updated", function () {
       scheduleScan();
       updatePanel();
+    });
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) { scheduleScan(); updatePanel(); }
     });
 
     scan();
