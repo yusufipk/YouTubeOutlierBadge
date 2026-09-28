@@ -43,10 +43,11 @@ var OBParse = (function () {
   /* "1.2M views" / "341,331 views" -> sayı. İngilizce kısaltmalara göre.
    * Kısaltma harfi bir kelimenin başı olmamalı: "2 months ago" içindeki 'm',
    * yoksa milyon çarpanı sanılıp 2'yi 2.000.000 yapardı. */
-  var EN_MULT = { k: 1e3, m: 1e6, b: 1e9 };
+  /* The spelled-out words come from aria-labels ("45 thousand views"). */
+  var EN_MULT = { k: 1e3, m: 1e6, b: 1e9, thousand: 1e3, million: 1e6, billion: 1e9 };
   function parseCountEn(text) {
     if (!text) return null;
-    var m = /([\d.,]+)\s*([KMB](?![A-Za-z]))?/i.exec(String(text).replace(/ /g, " "));
+    var m = /([\d.,]+)\s*(thousand|million|billion|[KMB](?![A-Za-z]))?/i.exec(String(text).replace(/ /g, " "));
     if (!m) return null;
     var num = m[1];
     var suffix = (m[2] || "").toLowerCase();
@@ -61,13 +62,13 @@ var OBParse = (function () {
 
   /* Sayfanın kendi metnini arayüz diline göre okur.
    * Türkçe: 24 B = 24.000, 1,3 Mn = 1.300.000, 2,1 Mr = 2.100.000.000 */
-  var TR_MULT = { b: 1e3, bin: 1e3, mn: 1e6, mr: 1e9 };
+  var TR_MULT = { b: 1e3, bin: 1e3, mn: 1e6, mr: 1e9, milyon: 1e6, milyar: 1e9 };
   function parseCountUI(text, lang) {
     if (!text) return null;
     var s = String(text).replace(/ /g, " ");
     var turkish = (lang || "").toLowerCase().indexOf("tr") === 0;
     if (!turkish) return parseCountEn(s);
-    var m = /([\d.,]+)\s*(Mn|Mr|bin|B)(?![a-zA-ZğüşöçıİĞÜŞÖÇ])/i.exec(s);
+    var m = /([\d.,]+)\s*(milyon|milyar|Mn|Mr|bin|B)(?![a-zA-ZğüşöçıİĞÜŞÖÇ])/i.exec(s);
     if (m) {
       var value = parseFloat(m[1].replace(/\./g, "").replace(/,/g, "."));
       var mult = TR_MULT[m[2].toLowerCase()];

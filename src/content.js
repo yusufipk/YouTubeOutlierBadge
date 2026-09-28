@@ -62,14 +62,28 @@
   /* Kartın üzerindeki izlenme metni. Baseline'da bulunamayan videolar için son
    * çare: kanalın son N videosuna girmeyen eski videolar böyle puanlanır.
    * Metin kullanıcının arayüz dilinde geldiği için dil bilgisiyle okunur. */
-  function domViews(card) {
-    var lang = document.documentElement.lang || "en";
+  /* Newer lockup cards drop the words from the visible text: views show as a
+   * play icon plus "44 B" and age as "2 hf. önce" or "18y ago". The full form
+   * ("44 bin görüntüleme", "2 hafta önce") is only in the aria-label, so that
+   * is read first and the visible text is the fallback for older layouts. */
+  function metaTexts(card) {
+    var out = [];
     var nodes = card.querySelectorAll("span, .yt-core-attributed-string");
     for (var i = 0; i < nodes.length; i++) {
+      var label = (nodes[i].getAttribute("aria-label") || "").trim();
       var t = (nodes[i].textContent || "").trim();
-      if (!t || t.length > 40) continue;
-      if (/view|görüntüleme|goruntuleme|izlenme/i.test(t)) {
-        var n = P.parseCountUI(t, lang);
+      if (label && label.length <= 40) out.push(label);
+      if (t && t.length <= 40) out.push(t);
+    }
+    return out;
+  }
+
+  function domViews(card) {
+    var lang = document.documentElement.lang || "en";
+    var texts = metaTexts(card);
+    for (var i = 0; i < texts.length; i++) {
+      if (/view|görüntüleme|goruntuleme|izlenme/i.test(texts[i])) {
+        var n = P.parseCountUI(texts[i], lang);
         if (n) return n;
       }
     }
@@ -77,12 +91,10 @@
   }
 
   function domAgeDays(card) {
-    var nodes = card.querySelectorAll("span, .yt-core-attributed-string");
-    for (var i = 0; i < nodes.length; i++) {
-      var t = (nodes[i].textContent || "").trim();
-      if (!t || t.length > 40) continue;
-      if (/ago|önce|once/i.test(t)) {
-        var d = P.parseAgeDays(t);
+    var texts = metaTexts(card);
+    for (var i = 0; i < texts.length; i++) {
+      if (/ago|önce|once/i.test(texts[i])) {
+        var d = P.parseAgeDays(texts[i]);
         if (d != null) return d;
       }
     }
