@@ -327,9 +327,10 @@ var OBTube = (function () {
       var counter = P.findFirst(data, "videoViewCountRenderer") || {};
       /* viewCount tam sayıyı verir ("63,087 views"); yoksa kısaltılmışa düş.
        * Süren canlı yayında aynı alan "12,345 watching now" der; bu izlenme
-       * değil anlık izleyicidir, sayı sanılırsa skor uydurma çıkar. */
+       * değil anlık izleyicidir, sayı sanılırsa skor uydurma çıkar.
+       * A scheduled premiere says "N waiting" there for the same reason. */
       var countText = P.textOf(counter.viewCount) || P.textOf(counter.shortViewCount);
-      var views = /watching/i.test(countText) ? null : P.parseCountEn(countText);
+      var views = /watching|waiting/i.test(countText) ? null : P.parseCountEn(countText);
       var primary = P.findFirst(data, "videoPrimaryInfoRenderer") || {};
       return {
         channelId: /^UC[\w-]{22}$/.test(channelId) ? channelId : null,

@@ -78,6 +78,56 @@
     return out;
   }
 
+  /* Search results (ytd-video-renderer) show the short count ("66 B") in the
+   * first metadata item with no word and no aria-label on the span, so the
+   * keyword match misses it. The item's position is the only marker left. */
+  function metadataLineViews(card, lang) {
+    /* parseCountUI only knows these two; elsewhere a bare item is ambiguous. */
+    if (!/^(tr|en)/i.test(lang)) return null;
+    var item = card.querySelector("#metadata-line .inline-metadata-item");
+    var t = item ? (item.textContent || "").trim() : "";
+    /* Only a bare short count ("66 B", "1,2 Mn", "45K"), never a date line. */
+    if (!/^\d[\d.,]*\s*[A-Za-z]{0,3}$/.test(t)) return null;
+    return P.parseCountUI(t, lang);
+  }
+
+  /* `next` results, per page load. Hover rebuilds re-run processCard, and a
+   * markup change could make every card miss the DOM read at once, so results
+   * are kept, requests share one in-flight promise per video (also with
+   * channelIdOf) and run at most two at a time. */
+  var NEXT_PARALLEL = 2;
+  var nextDetails = {};
+  var nextQueue = [];
+  var nextRunning = 0;
+
+  function pumpNext() {
+    while (nextRunning < NEXT_PARALLEL && nextQueue.length) {
+      var job = nextQueue.shift();
+      nextRunning++;
+      OBTube.videoDetails(job.id)
+        .then(job.resolve, job.reject)
+        .then(function () { nextRunning--; pumpNext(); });
+    }
+  }
+
+  function detailsOf(videoId) {
+    if (!nextDetails[videoId]) {
+      nextDetails[videoId] = new Promise(function (resolve, reject) {
+        nextQueue.push({ id: videoId, resolve: resolve, reject: reject });
+        pumpNext();
+      });
+      nextDetails[videoId].catch(function () { delete nextDetails[videoId]; });
+    }
+    return nextDetails[videoId];
+  }
+
+  /* Mix and playlist cards link to their first video; that video's score
+   * would be shown as if it were the collection's. */
+  function isCollectionCard(card) {
+    if (card.tagName === "YTD-PLAYLIST-VIDEO-RENDERER") return false;
+    return !!card.querySelector('a[href*="/watch?"][href*="list="]');
+  }
+
   function domViews(card) {
     var lang = document.documentElement.lang || "en";
     var texts = metaTexts(card);
@@ -87,7 +137,7 @@
         if (n) return n;
       }
     }
-    return null;
+    return metadataLineViews(card, lang);
   }
 
   function domAgeDays(card) {
@@ -147,7 +197,7 @@
     var key = "v:" + videoId;
     return OBStore.readChannelId(key).then(function (cached) {
       if (cached) return cached;
-      return OBTube.videoDetails(videoId).then(function (d) {
+      return detailsOf(videoId).then(function (d) {
         if (d.channelId) OBStore.writeChannelId(key, d.channelId);
         return d.channelId;
       });
@@ -184,7 +234,17 @@
       if (card.obVideoId !== videoId) return;   /* kart başka videoya geçti */
       var own = OBScore.lookupViews(videoId, blob);
       var views = own ? own.views : domViews(card);
-      var result = OBScore.score(videoId, views, isShort, blob);
+      if (views != null || isCollectionCard(card)) return { blob: blob, own: own, views: views };
+      /* Last resort when the card text can't be read: `next` gives the
+       * exact count. Only for videos outside the baseline. */
+      return detailsOf(videoId).then(function (d) {
+        return { blob: blob, own: own, views: d.views };
+      });
+    }).then(function (ctx) {
+      if (!ctx || card.obVideoId !== videoId) return;
+      var blob = ctx.blob;
+      var own = ctx.own;
+      var result = OBScore.score(videoId, ctx.views, isShort, blob);
       if (result.score == null) {
         counters.skipped++;
         card.obBadged = false;
